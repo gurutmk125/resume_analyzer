@@ -1,7 +1,9 @@
+import json
+
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
 import database
-from models import AnalysisResponse
+from models import AnalysisResponse, AnalysisSummary, Recommendations
 from services.file_parser import InvalidResumeFileError, extract_resume_text
 from services.gemini_client import analyze_resume, score_to_tier
 
@@ -43,4 +45,25 @@ async def analyze_endpoint(
         score=result.score,
         tier=tier,
         recommendations=result.recommendations,
+    )
+
+
+@router.get("/api/analyses", response_model=list[AnalysisSummary])
+def list_analyses_endpoint():
+    rows = database.list_analyses()
+    return [AnalysisSummary(id=row["id"], created_at=row["created_at"], score=row["score"], tier=row["tier"]) for row in rows]
+
+
+@router.get("/api/analyses/{analysis_id}", response_model=AnalysisResponse)
+def get_analysis_endpoint(analysis_id: int):
+    row = database.get_analysis(analysis_id)
+    if row is None:
+        raise HTTPException(status_code=404, detail=f"No analysis found with id {analysis_id}.")
+
+    return AnalysisResponse(
+        id=row["id"],
+        created_at=row["created_at"],
+        score=row["score"],
+        tier=row["tier"],
+        recommendations=Recommendations(**json.loads(row["recommendations"])),
     )

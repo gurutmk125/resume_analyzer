@@ -46,3 +46,20 @@ def save_analysis(resume_text: str, jd_text: str, score: int, tier: str, recomme
         )
         conn.commit()
         return cursor.lastrowid, created_at
+
+
+def list_analyses() -> list[sqlite3.Row]:
+    with get_connection() as conn:
+        conn.row_factory = sqlite3.Row
+        cursor = conn.execute("SELECT id, created_at, score, tier FROM analyses ORDER BY id DESC")
+        return cursor.fetchall()
+
+
+def get_analysis(analysis_id: int) -> sqlite3.Row | None:
+    with get_connection() as conn:
+        conn.row_factory = sqlite3.Row
+        cursor = conn.execute(
+            "SELECT id, created_at, score, tier, recommendations FROM analyses WHERE id = ?",
+            (analysis_id,),
+        )
+        return cursor.fetchone()

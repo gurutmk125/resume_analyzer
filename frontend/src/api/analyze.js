@@ -10,3 +10,11 @@ export async function analyzeResume(resumeFile, jobDescription) {
     body: formData,
   });
 }
+
+export async function listAnalyses() {
+  return apiFetch("/api/analyses");
+}
+
+export async function getAnalysis(id) {
+  return apiFetch(`/api/analyses/${id}`);
+}

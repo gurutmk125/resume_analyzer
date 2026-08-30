@@ -24,3 +24,10 @@ class AnalysisResponse(BaseModel):
     score: int
     tier: str
     recommendations: Recommendations
+
+
+class AnalysisSummary(BaseModel):
+    id: int
+    created_at: str
+    score: int
+    tier: str

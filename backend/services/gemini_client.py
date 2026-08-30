@@ -2,7 +2,7 @@ import os
 
 from google import genai
 
-GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_MODEL = "gemini-3.6-flash"
 
 
 def ping_gemini(prompt: str) -> str:

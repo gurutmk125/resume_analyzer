@@ -1,12 +1,23 @@
+from contextlib import asynccontextmanager
+
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 
+from database import init_db  # noqa: E402
 from routes.ping import router as ping_router  # noqa: E402
+from routes.resume import router as resume_router  # noqa: E402
 
-app = FastAPI(title="Resume Analyzer API")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    yield
+
+
+app = FastAPI(title="Resume Analyzer API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -16,3 +27,4 @@ app.add_middleware(
 )
 
 app.include_router(ping_router)
+app.include_router(resume_router)
